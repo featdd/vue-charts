@@ -52,8 +52,9 @@ var isLoaded = false;
 var googlePromise = makeDeferred();
 
 function googleChartsLoader() {
-  var packages = arguments.length <= 0 || arguments[0] === undefined ? ['corechart'] : arguments[0];
-  var version = arguments.length <= 1 || arguments[1] === undefined ? 'current' : arguments[1];
+  var packages = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : ['corechart'];
+  var version = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'current';
+  var language = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'en';
 
   if (!Array.isArray(packages)) {
     throw new TypeError('packages must be an array');
@@ -76,7 +77,8 @@ function googleChartsLoader() {
   script.onreadystatechange = script.onload = function () {
     // After the 'loader.js' is loaded, load our version and packages
     google.charts.load(version, {
-      packages: packages
+      packages: packages,
+      language: language
     });
 
     // After we've loaded Google Charts, resolve our promise
@@ -131,6 +133,10 @@ var props = {
     default: function _default() {
       return {};
     }
+  },
+  language: {
+    type: String,
+    default: 'en'
   },
   columns: {
     required: true,
@@ -194,7 +200,7 @@ var Chart = {
   },
   ready: function ready() {
     var self = this;
-    googleChartsLoader(self.packages, self.version).then(self.drawChart).then(function () {
+    googleChartsLoader(self.packages, self.version, self.language).then(self.drawChart).then(function () {
       // we don't want to bind props because it's a kind of "computed" property
       var watchProps = props;
       delete watchProps.bounds;
@@ -216,7 +222,6 @@ var Chart = {
      * @link https://developers.google.com/chart/interactive/docs/reference#DataTable
      * @return object
      */
-
     buildDataTable: function buildDataTable() {
       var self = this;
 
@@ -331,7 +336,7 @@ var Chart = {
 };
 
 function install(Vue) {
-  var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
   Vue.component('vue-chart', Chart);
 }

@@ -30,6 +30,10 @@ let props = {
       return {}
     }
   },
+  language: {
+    type: String,
+    default: 'en'
+  },
   columns: {
     required: true,
     type: Array
@@ -94,7 +98,7 @@ export default {
   },
   ready () {
     let self = this
-    loadCharts(self.packages, self.version)
+    loadCharts(self.packages, self.version, self.language)
       .then(self.drawChart)
       .then(() => {
         // we don't want to bind props because it's a kind of "computed" property
